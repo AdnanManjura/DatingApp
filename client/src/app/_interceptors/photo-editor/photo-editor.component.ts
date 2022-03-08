@@ -32,19 +32,19 @@ export class PhotoEditorComponent implements OnInit {
     this.hasBaseDropzoneOver = e;
   }
 
-  setMainPhoto(photo){
+  setMainPhoto(photo: Photo) {
     this.memberService.setMainPhoto(photo.id).subscribe(() => {
       this.user.photoUrl = photo.url;
       this.accountService.setCurrentUser(this.user);
       this.member.photoUrl = photo.url;
       this.member.photos.forEach(p => {
-        if(p.isMain) p.isMain = false;
-        if(p.id == photo.id) p.isMain = true;
+        if (p.isMain) p.isMain = false;
+        if (p.id === photo.id) p.isMain = true;
       })
     })
-  }
+  } 
 
-  deletePhoto(photoId: number){
+  deletePhoto(photoId: number) {
     this.memberService.deletePhoto(photoId).subscribe(() => {
       this.member.photos = this.member.photos.filter(x => x.id !== photoId);
     })
@@ -67,8 +67,13 @@ export class PhotoEditorComponent implements OnInit {
 
     this.uploader.onSuccessItem = (item, response, status, headers) => {
       if (response) {
-        const photo = JSON.parse(response);
+        const photo: Photo = JSON.parse(response);
         this.member.photos.push(photo);
+         if (photo.isMain) {
+           this.user.photoUrl = photo.url;
+           this.member.photoUrl = photo.url;
+           this.accountService.setCurrentUser(this.user);
+         }
       }
     }
   }
